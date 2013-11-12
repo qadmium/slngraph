@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace slngraph
 {
@@ -54,9 +52,11 @@ namespace slngraph
 
             foreach (var project in projects)
             {
-                project.DependsOnGuids = project.DependsOnGuids.Distinct();
+                var dependsList = project.DependsOnGuids.ToList();
 
-                project.AllDependsOnProjects = project.DependsOnGuids.Select(guid => projects.Single(proj => proj.Guid == guid));
+                project.DependsOnGuids = dependsList.Distinct().ToList();
+
+                project.AllDependsOnProjects = dependsList.Select(guid => projects.Single(proj => proj.Guid == guid)).ToList();
             }
 
             Projects = prepareExplicitDependecies(projects.OrderBy(project => project.Name));
@@ -96,9 +96,11 @@ namespace slngraph
 
         private IEnumerable<Project> prepareExplicitDependecies(IEnumerable<Project> projects)
         {
-            foreach (var project in projects)
+            var projectsList = projects.ToList();
+
+            foreach (var project in projectsList)
             {
-                var dependencies = project.AllDependsOnProjects;
+                var dependencies = project.AllDependsOnProjects.ToList();
                 var result = new List<Project>();
 
                 foreach (var dependency in dependencies)
@@ -112,7 +114,7 @@ namespace slngraph
                 project.ExplicitDependsOnProjects = result;
             }
 
-            return projects;
+            return projectsList;
         }
     }
 }
